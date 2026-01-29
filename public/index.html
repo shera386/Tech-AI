@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tech-AI Assistent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="logo">T</div>
+        <div>
+          <div>Tech-AI</div>
+          <small style="font-size:11px; opacity:0.8;">Ruhiger Technik-Helfer – Schritt für Schritt.</small>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center; position:relative;">
+        <label style="font-size:12px;">
+          Modus:
+          <select id="mode-select">
+            <option value="unerfahren">Unerfahren (sehr einfach)</option>
+            <option value="erfahren">Erfahren</option>
+          </select>
+        </label>
+
+        <button id="stream-toggle-btn">Streaming starten</button>
+        <button id="new-topic-btn">Neues Problem</button>
+        <button id="profile-btn" class="primary">Profil</button>
+
+        <div id="profile-menu" class="profile-menu">
+          <h4>Profil & Einstellungen</h4>
+          <p id="profile-email" style="margin-bottom:8px; opacity:0.8;">(Demo: lokal)</p>
+
+          <label>
+            <span>Chats speichern</span>
+            <input type="checkbox" id="save-chats-toggle" checked />
+          </label>
+
+          <label>
+            <span>Geräte speichern</span>
+            <input type="checkbox" id="save-devices-toggle" checked />
+          </label>
+
+          <label>
+            <span>Vorlesen (TTS)</span>
+            <input type="checkbox" id="tts-toggle" />
+          </label>
+
+          <button id="clear-all-chats-btn" class="btn-small btn-outline" style="margin-top:8px;">
+            Alle Chats löschen
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Linke Sidebar -->
+    <aside class="sidebar-left">
+      <div class="panel">
+        <h3>Flex-Abo – täglich kündbar</h3>
+        <div class="price">0,24 € / Tag</div>
+        <p>Unbegrenzte Fragen zu allen Technik-Themen. Jederzeit kündbar.</p>
+        <button class="btn-small" onclick="window.open('https://example.com/flex','_blank')">Flex-Abo</button>
+        <p class="small-muted">Demo-Links. Später ersetzt du sie durch echte Links.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Spar-Abo – alle 2 Monate</h3>
+        <div class="price">2,99 € / 2 Monate</div>
+        <p>Ideal, wenn du Tech-AI regelmäßig nutzt.</p>
+        <button class="btn-small btn-outline" onclick="window.open('https://example.com/spar','_blank')">Spar-Abo</button>
+      </div>
+
+      <div class="panel">
+        <h3>Kostenlose Zeit</h3>
+        <p>Pro Thema kostenlos (Limit). Kulanz: das Problem wird zu Ende gelöst.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Tech-Tipps Datei</h3>
+        <p>Eigene Notizen in <code>tech-tips.txt</code> (nur Betreiber).</p>
+      </div>
+    </aside>
+
+    <!-- Hauptbereich -->
+    <main>
+      <div class="system-banner" id="system-banner">
+        Willkommen bei <strong>Tech-AI</strong> 😊 Beschreibe dein Problem kurz.
+        Wenn du „wo klicken?“ schreibst und Streaming läuft, mache ich automatisch einen Screenshot.
+      </div>
+      <div id="chat"></div>
+    </main>
+
+    <!-- Rechte Sidebar -->
+    <aside class="sidebar-right">
+      <div class="panel">
+        <h3>
+          Aktuelles Thema
+          <button id="mark-solved-btn" class="btn-small btn-outline" style="width:auto; padding:4px 10px; font-size:11px;">
+            Problem gelöst
+          </button>
+        </h3>
+        <p id="current-topic-label" style="font-size:12px; margin-top:4px;">
+          Noch kein Problem beschrieben. Starte unten mit deiner ersten Frage.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Deine Geräte</h3>
+        <div class="device-list" id="device-list"></div>
+        <button id="add-device-btn" class="btn-small btn-outline" style="margin-top:6px;">Gerät hinzufügen</button>
+        <p class="small-muted">Geräte werden in Antworten berücksichtigt.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Deine Chats</h3>
+        <div class="session-list" id="session-list"></div>
+        <p class="small-muted">Klick auf einen Chat lädt den Verlauf.</p>
+      </div>
+    </aside>
+
+    <!-- Eingabebereich -->
+    <div class="input-bar">
+      <button id="gallery-btn" class="send-btn secondary">📎</button>
+      <button id="cam-back-btn" class="send-btn secondary">📷</button>
+      <button id="cam-front-btn" class="send-btn secondary">🤳</button>
+      <button id="voice-btn" class="send-btn secondary">🎙️</button>
+
+      <input type="file" id="image-input" accept="image/*" style="display:none;" />
+
+      <div class="input-wrapper">
+        <textarea id="message-input" placeholder="z. B. 'Meine Bluetooth-Kopfhörer werden nicht gefunden'"></textarea>
+        <div class="input-footer">
+          <label class="toggle">
+            <input type="checkbox" id="web-search-toggle" />
+            <span>Websuche (Tests & Bewertungen)</span>
+          </label>
+
+          <span id="answer-counter">Antworten in diesem Thema: 0 / 25</span>
+
+          <label class="toggle">
+            <input type="checkbox" id="auto-vision-toggle" checked />
+            <span>Auto-Screenshot bei „wo klicken?“</span>
+          </label>
+        </div>
+      </div>
+      <button id="send-btn" class="send-btn">Senden</button>
+    </div>
+  </div>
+
+  <!-- Streaming Overlay -->
+  <div id="stream-overlay" class="stream-overlay">
+    <div class="stream-overlay-header">
+      <span>Streaming aktiv</span>
+      <button id="stream-close-btn" class="icon-btn">✕</button>
+    </div>
+
+    <video id="stream-video" autoplay muted></video>
+
+    <div class="stream-tools">
+      <button id="overlay-mic-btn" class="on">🎙️ an</button>
+      <button id="overlay-shot-btn">📸 Screenshot</button>
+      <button id="overlay-tts-btn">🔊 Vorlesen aus</button>
+    </div>
+
+    <div class="stream-mini">
+      <input id="overlay-text" placeholder="kurz schreiben…" />
+      <button id="overlay-send">Senden</button>
+    </div>
+  </div>
+
+  <!-- Device Modal -->
+  <div id="device-modal" class="modal">
+    <div class="box">
+      <div class="head">
+        <h3>Gerät hinzufügen</h3>
+        <button id="device-close">Schließen</button>
+      </div>
+
+      <div class="search">
+        <input id="device-search" placeholder="Suchen: Smartphone, GPU, E-Scooter, Waschmaschine…" />
+      </div>
+
+      <div class="list" id="device-type-list"></div>
+
+      <div class="foot">
+        <input id="device-name" placeholder="Modell / Name (z.B. Samsung A26, RTX 3060, Xiaomi…)" />
+        <button id="device-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
+
