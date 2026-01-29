@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tech AI – Debug Chat</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #050816;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    #log {
+      margin-top: 20px;
+      max-width: 800px;
+    }
+    .msg {
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      max-width: 80%;
+      white-space: pre-wrap;
+    }
+    .user {
+      background: linear-gradient(90deg, #2563eb, #22c55e);
+      margin-left: auto;
+      text-align: right;
+    }
+    .bot {
+      background: #111827;
+      border: 1px solid #374151;
+      margin-right: auto;
+    }
+    #inputRow {
+      margin-top: 20px;
+      max-width: 800px;
+      display: flex;
+      gap: 8px;
+    }
+    #message {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #22c55e;
+      color: #020617;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tech AI – Debug Chat</h1>
+  <p>Diese Seite testet nur, ob <code>/api/chat</code> korrekt antwortet.</p>
+
+  <div id="log"></div>
+
+  <div id="inputRow">
+    <input id="message" placeholder="Schreib etwas..." />
+    <button id="sendBtn">Senden</button>
+  </div>
+
+  <script>
+    const log = document.getElementById("log");
+    const input = document.getElementById("message");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function addMsg(text, type) {
+      const div = document.createElement("div");
+      div.className = "msg " + type;
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMsg(text, "user");
+      input.value = "";
+      input.focus();
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            mode: "Debug",
+            historyCount: 0
+          }),
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Fehler-Response:", res.status, errorText);
+          addMsg("Fehler vom Server: " + res.status, "bot");
+          return;
+        }
+
+        const data = await res.json();
+        console.log("Antwort JSON:", data);
+        addMsg(data.reply || JSON.stringify(data), "bot");
+      } catch (err) {
+        console.error("Fetch-Fehler:", err);
+        addMsg("Netzwerkfehler: " + err.message, "bot");
+      }
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") send();
+    });
+  </script>
+</body>
+</html>
+
